@@ -5,6 +5,7 @@ import io.realm.RealmObject;
 public class Tune extends RealmObject {
     private int id;
     private String title;
+    private String artist;
     private double length;
     private int like;
 
@@ -22,6 +23,14 @@ public class Tune extends RealmObject {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 
     public double getLength() {
