@@ -3,9 +3,10 @@ package com.konatsup.musicapp;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
-import java.util.Calendar;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
         listView = (ListView) findViewById(R.id.listView);
 
+        deleteAll();
         add();
         add();
         add();
@@ -30,14 +32,23 @@ public class MainActivity extends AppCompatActivity {
         RealmResults<Tune> result = realm.where(Tune.class).findAll();
         adapter = new PlayListAdapter(result);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                PlayerFragment fragment = new PlayerFragment();
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("selected", position);
+//                fragment.setArguments(bundle);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.add(R.id.container, fragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
 
-//        PlayerFragment fragment = new PlayerFragment();
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.add(R.id.container, fragment);
-//        transaction.commit();
     }
 
-    public void add(){
+    public void add() {
         realm.beginTransaction();
         Tune tune = realm.createObject(Tune.class);
         tune.setId(1);
@@ -49,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void deleteAll(){
+    public void deleteAll() {
         final RealmResults<Tune> result = realm.where(Tune.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
