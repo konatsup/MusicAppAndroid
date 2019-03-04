@@ -10,9 +10,9 @@ import android.widget.TextView;
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmBaseAdapter;
 
-public class PlayListAdapter extends RealmBaseAdapter<Tune> implements ListAdapter {
+public class PlaylistAdapter extends RealmBaseAdapter<Tune> implements ListAdapter {
 
-    public PlayListAdapter(OrderedRealmCollection<Tune> realmResults){
+    public PlaylistAdapter(OrderedRealmCollection<Tune> realmResults){
         super(realmResults);
     }
 
