@@ -1,29 +1,17 @@
 package com.konatsup.musicapp;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
-
 
 import com.konatsup.musicapp.fragment.HomeFragment;
 import com.konatsup.musicapp.fragment.PlayerFragment;
 import com.konatsup.musicapp.fragment.PlaylistFragment;
 import com.konatsup.musicapp.fragment.SearchFragment;
-import com.konatsup.musicapp.service.PostService;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity implements ListItemClickListener {
