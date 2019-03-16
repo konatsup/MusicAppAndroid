@@ -8,6 +8,7 @@ public class Tune extends RealmObject {
     private String artist;
     private double length;
     private int like;
+    private boolean isPlayListed;
 
     public int getId() {
         return id;
@@ -47,6 +48,14 @@ public class Tune extends RealmObject {
 
     public void setLike(int like) {
         this.like = like;
+    }
+
+    public boolean isPlayListed() {
+        return isPlayListed;
+    }
+
+    public void setPlayListed(boolean playListed) {
+        isPlayListed = playListed;
     }
 
 }
