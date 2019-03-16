@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.konatsup.musicapp.ListItemClickListener;
 import com.konatsup.musicapp.ListPost;
@@ -33,8 +34,10 @@ public class PlaylistFragment extends Fragment {
     private ListView listView;
     private PlaylistAdapter adapter;
     private ListItemClickListener mListener;
+    private ProgressBar progressBar;
 
     private List<Tune> tunes;
+    private boolean isLoading;
 
     public PlaylistFragment() {
 
@@ -44,8 +47,8 @@ public class PlaylistFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         tunes = new ArrayList<>();
+        isLoading = false;
 
         fetchPosts();
         adapter = new PlaylistAdapter(getActivity(), R.layout.playlist, tunes);
@@ -58,6 +61,12 @@ public class PlaylistFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_playlist, container, false);
         listView = (ListView) view.findViewById(R.id.listView);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        if (isLoading) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -105,6 +114,8 @@ public class PlaylistFragment extends Fragment {
                     tunes.add(tune);
                 }
                 adapter.notifyDataSetChanged();
+                isLoading = false;
+                progressBar.setVisibility(View.GONE);
             }
             @Override
             public void onFailure(Call<ListPost> call, Throwable t) {

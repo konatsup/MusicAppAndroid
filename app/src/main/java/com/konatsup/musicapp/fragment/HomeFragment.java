@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.konatsup.musicapp.ListItemClickListener;
 import com.konatsup.musicapp.ListPost;
@@ -35,8 +36,10 @@ public class HomeFragment extends Fragment {
     private ListView listView;
     private PlaylistAdapter adapter;
     private ListItemClickListener mListener;
+    private ProgressBar progressBar;
 
     private List<Tune> tunes;
+    private boolean isLoading;
 
     public HomeFragment() {
     }
@@ -45,6 +48,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tunes = new ArrayList<>();
+        isLoading = false;
 
         fetchPosts();
         adapter = new PlaylistAdapter(getActivity(), R.layout.playlist, tunes);
@@ -56,6 +60,12 @@ public class HomeFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         listView = (ListView) view.findViewById(R.id.listView);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+        if (isLoading) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.GONE);
+        }
 
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,19 +89,20 @@ public class HomeFragment extends Fragment {
         mListener = null;
     }
 
-    private void fetchPosts(){
+    private void fetchPosts() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://music-app-konatsup.herokuapp.com/api/").addConverterFactory(GsonConverterFactory.create())
                 .build();
 
         PostService service = retrofit.create(PostService.class);
+        isLoading = true;
 
         service.getPosts().enqueue(new Callback<ListPost>() {
             @Override
             public void onResponse(Call<ListPost> call, Response<ListPost> response) {
                 List<Post> listPost = response.body().getListPost();
                 int s = listPost.size();
-                for(int i = 0; i < s; i++){
+                for (int i = 0; i < s; i++) {
                     Tune tune = new Tune();
                     tune.setId(1);
                     tune.setTitle(listPost.get(i).getTitle());
@@ -104,7 +115,10 @@ public class HomeFragment extends Fragment {
                     tunes.add(tune);
                 }
                 adapter.notifyDataSetChanged();
+                isLoading = false;
+                progressBar.setVisibility(View.GONE);
             }
+
             @Override
             public void onFailure(Call<ListPost> call, Throwable t) {
                 Log.d("debug4", t.getMessage());
