@@ -22,8 +22,6 @@ import com.konatsup.musicapp.service.PostService;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,7 +30,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PlaylistFragment extends Fragment {
 
-    private Realm realm;
     private ListView listView;
     private PlaylistAdapter adapter;
     private ListItemClickListener mListener;
@@ -48,9 +45,6 @@ public class PlaylistFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        realm = Realm.getDefaultInstance();
-
-        RealmResults<Tune> result = realm.where(Tune.class).equalTo("isPlayListed", true).findAll();
         tunes = new ArrayList<>();
 
         fetchPosts();
@@ -84,24 +78,6 @@ public class PlaylistFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-
-//    public void add() {
-//        realm.beginTransaction();
-//        tune.setPlayListed(false);
-//        realm.commitTransaction();
-//
-//    }
-
-    public void deleteAll() {
-        final RealmResults<Tune> result = realm.where(Tune.class).findAll();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                result.deleteAllFromRealm();
-            }
-        });
     }
 
     private void fetchPosts(){

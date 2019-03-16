@@ -23,8 +23,6 @@ import com.konatsup.musicapp.service.PostService;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,7 +32,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeFragment extends Fragment {
 
-    private Realm realm;
     private ListView listView;
     private PlaylistAdapter adapter;
     private ListItemClickListener mListener;
@@ -47,10 +44,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        realm = Realm.getDefaultInstance();
-//        deleteAll();
-        add();
-        RealmResults<Tune> result = realm.where(Tune.class).findAll();
         tunes = new ArrayList<>();
 
         fetchPosts();
@@ -84,43 +77,6 @@ public class HomeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-
-    public void add() {
-        realm.beginTransaction();
-        Tune tune = realm.createObject(Tune.class);
-        tune.setId(1);
-        tune.setTitle("愛迷エレジー");
-        tune.setArtist("DECO*27");
-        tune.setLength(184.0);
-        tune.setLike(20);
-        tune.setPlayListed(false);
-        realm.commitTransaction();
-
-    }
-
-    public void add2() {
-        realm.beginTransaction();
-        Tune tune = realm.createObject(Tune.class);
-        tune.setId(1);
-        tune.setTitle("愛迷エレジー");
-        tune.setArtist("DECO*27");
-        tune.setLength(184.0);
-        tune.setLike(3);
-        tune.setPlayListed(true);
-        realm.commitTransaction();
-
-    }
-
-    public void deleteAll() {
-        final RealmResults<Tune> result = realm.where(Tune.class).findAll();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                result.deleteAllFromRealm();
-            }
-        });
     }
 
     private void fetchPosts(){
