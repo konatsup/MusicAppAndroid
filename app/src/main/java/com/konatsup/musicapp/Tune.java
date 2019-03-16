@@ -1,5 +1,8 @@
 package com.konatsup.musicapp;
 
+import org.parceler.Parcel;
+
+@Parcel(Parcel.Serialization.BEAN)
 public class Tune
 {
     private int id;

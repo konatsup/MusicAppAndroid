@@ -13,6 +13,8 @@ import com.konatsup.musicapp.fragment.PlayerFragment;
 import com.konatsup.musicapp.fragment.PlaylistFragment;
 import com.konatsup.musicapp.fragment.SearchFragment;
 
+import org.parceler.Parcels;
+
 
 public class MainActivity extends AppCompatActivity implements ListItemClickListener {
 
@@ -92,11 +94,11 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     @Override
-    public void openPlayer() {
+    public void openPlayer(Tune tune) {
         PlayerFragment fragment = new PlayerFragment();
-//                Bundle bundle = new Bundle();
-//                bundle.putInt("selected", position);
-//                fragment.setArguments(bundle);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("tune", Parcels.wrap(tune));
+        fragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.container, fragment);
         transaction.addToBackStack(null);

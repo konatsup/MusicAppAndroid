@@ -10,7 +10,7 @@
         android:background="#fff">
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/jacketImage"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="20dp"
@@ -26,7 +26,7 @@
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/textView_title"
+                android:id="@+id/titleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="Title"
@@ -46,13 +46,13 @@
                 android:paddingRight="15dp">
 
                 <TextView
-                    android:id="@+id/textView_position"
+                    android:id="@+id/position"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="0:00" />
 
                 <TextView
-                    android:id="@+id/textView_duration"
+                    android:id="@+id/duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
@@ -66,31 +66,32 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/button_prev"
+                <Button
+                    android:id="@+id/buttonPrev"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="15dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/colorAccent"
-                    android:src="@drawable/ic_skip_previous_black_24dp" />
+                    android:background="@drawable/ic_skip_previous_black_24dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:tint="@color/colorAccent" />
 
-                <ImageButton
-                    android:id="@+id/button_play"
+                <Button
+                    android:id="@+id/buttonPlay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
-                    android:tint="@color/colorAccent"
-                    android:src="@drawable/ic_play_circle_filled_black_24dp" />
+                    android:background="@drawable/ic_play_circle_filled_black_24dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:tint="@color/colorAccent" />
 
-                <ImageButton
-                    android:id="@+id/button_next"
+                <Button
+                    android:id="@+id/buttonNext"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="15dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/colorAccent"
-                    android:src="@drawable/ic_skip_next_black_24dp"/>
+                    android:background="@drawable/ic_skip_next_black_24dp"
+                    android:backgroundTint="@color/colorAccent"
+                    android:tint="@color/colorAccent" />
 
             </LinearLayout>
         </LinearLayout>
