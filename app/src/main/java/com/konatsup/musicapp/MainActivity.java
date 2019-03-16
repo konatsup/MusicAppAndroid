@@ -7,6 +7,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.konatsup.musicapp.fragment.HomeFragment;
 import com.konatsup.musicapp.fragment.PlayerFragment;
@@ -18,9 +21,13 @@ import org.parceler.Parcels;
 
 public class MainActivity extends AppCompatActivity implements ListItemClickListener {
 
+    Tune currentTune;
     BottomNavigationView bottomNavigationView;
 
     private ViewPager viewPager;
+    private LinearLayout summaryBar;
+    private TextView titleTextView;
+    private TextView artistTextView;
 
     HomeFragment homeFragment;
     SearchFragment searchFragment;
@@ -34,6 +41,15 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigation);
+        summaryBar = (LinearLayout) findViewById(R.id.summaryBar);
+        titleTextView = (TextView) summaryBar.findViewById(R.id.title);
+        artistTextView = (TextView) summaryBar.findViewById(R.id.artist);
+
+        currentTune = new Tune();
+        currentTune.setTitle("タイトル");
+        currentTune.setArtist("アーティスト名");
+
+        setupSummaryBar(currentTune);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -53,6 +69,13 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
                         return false;
                     }
                 });
+
+        summaryBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openPlayer(currentTune);
+            }
+        });
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -82,6 +105,11 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
     }
 
+    private void setupSummaryBar(Tune tune) {
+        titleTextView.setText(tune.getTitle());
+        artistTextView.setText(tune.getArtist());
+    }
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         homeFragment = new HomeFragment();
@@ -95,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
     @Override
     public void openPlayer(Tune tune) {
+        setupSummaryBar(tune);
+        currentTune = tune;
         PlayerFragment fragment = new PlayerFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable("tune", Parcels.wrap(tune));
