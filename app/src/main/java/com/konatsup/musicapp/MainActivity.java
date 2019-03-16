@@ -43,31 +43,6 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         setContentView(R.layout.activity_main);
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://music-app-konatsup.herokuapp.com/api/").addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        PostService service = retrofit.create(PostService.class);
-
-        service.getPosts().enqueue(new Callback<ListPost>() {
-            @Override
-            public void onResponse(Call<ListPost> call, Response<ListPost> response) {
-                List<Post> listPost = response.body().getListPost();
-                int s = listPost.size();
-                for(int i = 0; i < s; i++){
-                    Log.d("debug3", listPost.get(i).getTitle());
-                    Log.d("debug3", listPost.get(i).getDescription());
-                    Log.d("debug3", listPost.get(i).getImage_url());
-                    Log.d("debug3", listPost.get(i).getMusic_url());
-                }
-            }
-            @Override
-            public void onFailure(Call<ListPost> call, Throwable t) {
-                Log.d("debug4", t.getMessage());
-            }
-
-        });
-
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigation);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
