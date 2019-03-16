@@ -45,10 +45,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         titleTextView = (TextView) summaryBar.findViewById(R.id.title);
         artistTextView = (TextView) summaryBar.findViewById(R.id.artist);
 
-        currentTune = new Tune();
-        currentTune.setTitle("タイトル");
-        currentTune.setArtist("アーティスト名");
-
+        initializeCurrentTune();
         setupSummaryBar(currentTune);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(
@@ -103,6 +100,12 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
         setupViewPager(viewPager);
 
+    }
+
+    private void initializeCurrentTune(){
+        currentTune = new Tune();
+        currentTune.setTitle("タイトル");
+        currentTune.setArtist("アーティスト名");
     }
 
     private void setupSummaryBar(Tune tune) {
