@@ -19,7 +19,7 @@ import com.konatsup.musicapp.fragment.SearchFragment;
 import org.parceler.Parcels;
 
 
-public class MainActivity extends AppCompatActivity implements ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements ListItemClickListener, BottomNavigationVisibilityListener {
 
     Tune currentTune;
     BottomNavigationView bottomNavigationView;
@@ -102,7 +102,17 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
     }
 
-    private void initializeCurrentTune(){
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    private void initializeCurrentTune() {
         currentTune = new Tune();
         currentTune.setTitle("タイトル");
         currentTune.setArtist("アーティスト名");
@@ -133,8 +143,17 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         bundle.putParcelable("tune", Parcels.wrap(tune));
         fragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.container, fragment);
+        transaction.add(R.id.playerContainer, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void setBottomNavigationVisibility(boolean isVisible) {
+        if (isVisible) {
+            bottomNavigationView.setVisibility(View.VISIBLE);
+        } else {
+            bottomNavigationView.setVisibility(View.GONE);
+        }
     }
 }

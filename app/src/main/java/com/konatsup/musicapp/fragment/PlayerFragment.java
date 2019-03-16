@@ -1,5 +1,6 @@
 package com.konatsup.musicapp.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.konatsup.musicapp.BottomNavigationVisibilityListener;
 import com.konatsup.musicapp.R;
 import com.konatsup.musicapp.Tune;
 
@@ -23,6 +25,8 @@ public class PlayerFragment extends Fragment {
     private Button prevButton;
     private Button playButton;
     private Button nextButton;
+    private BottomNavigationVisibilityListener bottomNavListener;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,4 +45,17 @@ public class PlayerFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        bottomNavListener = (BottomNavigationVisibilityListener) context;
+        bottomNavListener.setBottomNavigationVisibility(false);
+    }
+
+    @Override
+    public void onDetach() {
+        bottomNavListener.setBottomNavigationVisibility(true);
+        bottomNavListener = null;
+        super.onDetach();
+    }
 }

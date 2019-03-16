@@ -85,8 +85,8 @@ public class PlaylistFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        super.onDetach();
         mListener = null;
+        super.onDetach();
     }
 
     private void fetchPosts(){
