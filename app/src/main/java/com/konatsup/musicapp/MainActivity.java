@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     private TextView artistTextView;
 
     HomeFragment homeFragment;
-    SearchFragment searchFragment;
     PlaylistFragment playlistFragment;
     MenuItem prevMenuItem;
 
@@ -55,9 +54,6 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
                         switch (item.getItemId()) {
                             case R.id.action_call:
                                 viewPager.setCurrentItem(0);
-                                break;
-                            case R.id.action_chat:
-                                viewPager.setCurrentItem(1);
                                 break;
                             case R.id.action_contact:
                                 viewPager.setCurrentItem(2);
@@ -126,10 +122,8 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         homeFragment = new HomeFragment();
-        searchFragment = new SearchFragment();
         playlistFragment = new PlaylistFragment();
         adapter.addFragment(homeFragment);
-        adapter.addFragment(searchFragment);
         adapter.addFragment(playlistFragment);
         viewPager.setAdapter(adapter);
     }
