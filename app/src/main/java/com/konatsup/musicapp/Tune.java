@@ -6,6 +6,8 @@ public class Tune extends RealmObject {
     private int id;
     private String title;
     private String artist;
+    private String imageUrl;
+    private String musicUrl;
     private double length;
     private int like;
     private boolean isPlayListed;
@@ -33,6 +35,14 @@ public class Tune extends RealmObject {
     public void setArtist(String artist) {
         this.artist = artist;
     }
+
+    public String getImageUrl() { return imageUrl; }
+
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getMusicUrl() { return musicUrl; }
+
+    public void setMusicUrl(String musicUrl) { this.musicUrl = musicUrl; }
 
     public double getLength() {
         return length;
