@@ -15,7 +15,7 @@ import com.konatsup.musicapp.fragment.PlaylistFragment;
 import com.konatsup.musicapp.fragment.SearchFragment;
 
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.ListItemClickListener{
+public class MainActivity extends AppCompatActivity implements ListItemClickListener{
 
     BottomNavigationView bottomNavigationView;
 
