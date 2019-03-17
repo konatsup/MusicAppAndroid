@@ -66,31 +66,28 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <Button
+                <ImageButton
                     android:id="@+id/buttonPrev"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="15dp"
-                    android:background="@drawable/ic_skip_previous_black_24dp"
-                    android:backgroundTint="@color/colorAccent"
+                    android:src="@drawable/ic_skip_previous_black_24dp"
                     android:tint="@color/colorAccent" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/buttonPlay"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="15dp"
-                    android:background="@drawable/ic_play_circle_filled_black_24dp"
-                    android:backgroundTint="@color/colorAccent"
+                    android:src="@drawable/ic_play_circle_filled_black_24dp"
                     android:tint="@color/colorAccent" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/buttonNext"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="15dp"
-                    android:background="@drawable/ic_skip_next_black_24dp"
-                    android:backgroundTint="@color/colorAccent"
+                    android:src="@drawable/ic_skip_next_black_24dp"
                     android:tint="@color/colorAccent" />
 
             </LinearLayout>

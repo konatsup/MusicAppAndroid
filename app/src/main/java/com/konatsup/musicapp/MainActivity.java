@@ -1,25 +1,46 @@
 package com.konatsup.musicapp;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.konatsup.musicapp.fragment.HomeFragment;
 import com.konatsup.musicapp.fragment.PlayerFragment;
 import com.konatsup.musicapp.fragment.PlaylistFragment;
-import com.konatsup.musicapp.fragment.SearchFragment;
 
 import org.parceler.Parcels;
 
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements ListItemClickListener, BottomNavigationVisibilityListener {
+
+public class MainActivity extends AppCompatActivity implements ListItemClickListener, PlayerFragmentListener {
+
+    MediaBrowserCompat mBrowser;
+    MediaControllerCompat mController;
+    MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
+        //再生中の曲の情報が変更された際に呼び出される
+        @Override
+        public void onMetadataChanged(MediaMetadataCompat metadata) { }
+
+        //プレイヤーの状態が変更された時に呼び出される
+        @Override
+        public void onPlaybackStateChanged(PlaybackStateCompat state) { }
+    };
 
     Tune currentTune;
     BottomNavigationView bottomNavigationView;
@@ -96,6 +117,15 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
 
         setupViewPager(viewPager);
 
+        //サービスは開始しておく
+        //Activity破棄と同時にServiceも停止して良いならこれは不要
+        startService(new Intent(this, MusicService.class));
+
+        //MediaBrowserを初期化
+        mBrowser = new MediaBrowserCompat(this, new ComponentName(this, MusicService.class), connectionCallback, null);
+        //接続(サービスをバインド)
+        mBrowser.connect();
+
     }
 
     @Override
@@ -128,6 +158,59 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         viewPager.setAdapter(adapter);
     }
 
+    //接続時に呼び出されるコールバック
+    private MediaBrowserCompat.ConnectionCallback connectionCallback = new MediaBrowserCompat.ConnectionCallback() {
+        @Override
+        public void onConnected() {
+            try {
+                //接続が完了するとSessionTokenが取得できるので
+                //それを利用してMediaControllerを作成
+                mController = new MediaControllerCompat(MainActivity.this, mBrowser.getSessionToken());
+                //サービスから送られてくるプレイヤーの状態や曲の情報が変更された際のコールバックを設定
+                mController.registerCallback(controllerCallback);
+
+                //既に再生中だった場合コールバックを自ら呼び出してUIを更新
+                if (mController.getPlaybackState() != null && mController.getPlaybackState().getState() == PlaybackStateCompat.STATE_PLAYING) {
+                    controllerCallback.onMetadataChanged(mController.getMetadata());
+                    controllerCallback.onPlaybackStateChanged(mController.getPlaybackState());
+                }
+
+
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+                Toast.makeText(MainActivity.this, ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+            //サービスから再生可能な曲のリストを取得
+            mBrowser.subscribe(mBrowser.getRoot(), subscriptionCallback);
+        }
+    };
+
+    //Subscribeした際に呼び出されるコールバック
+    private MediaBrowserCompat.SubscriptionCallback subscriptionCallback = new MediaBrowserCompat.SubscriptionCallback() {
+        @Override
+        public void onChildrenLoaded(@NonNull String parentId, @NonNull List<MediaBrowserCompat.MediaItem> children) {
+            //既に再生中でなければ初めの曲を再生をリクエスト
+            if (mController.getPlaybackState() == null)
+                Play(children.get(0).getMediaId());
+        }
+    };
+
+
+    private void Play(String id) {
+        //MediaControllerからサービスへ操作を要求するためのTransportControlを取得する
+        //playFromMediaIdを呼び出すと、サービス側のMediaSessionのコールバック内のonPlayFromMediaIdが呼ばれる
+        mController.getTransportControls().playFromMediaId(id, null);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBrowser.disconnect();
+        if (mController.getPlaybackState().getState() != PlaybackStateCompat.STATE_PLAYING)
+            stopService(new Intent(this, MusicService.class));
+    }
+
+
     @Override
     public void openPlayer(Tune tune) {
         setupSummaryBar(tune);
@@ -143,11 +226,41 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     @Override
-    public void setBottomNavigationVisibility(boolean isVisible) {
+    public void switchBottomNavigationVisibility(boolean isVisible) {
         if (isVisible) {
             bottomNavigationView.setVisibility(View.VISIBLE);
         } else {
             bottomNavigationView.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void setControllerCallBack(MediaControllerCompat.Callback callback) {
+        controllerCallback = callback;
+    }
+
+    @Override
+    public void skipToPrevious() {
+        mController.getTransportControls().skipToPrevious();
+    }
+
+    @Override
+    public void skipToNext() {
+        mController.getTransportControls().skipToNext();
+    }
+
+    @Override
+    public void pause() {
+        mController.getTransportControls().pause();
+    }
+
+    @Override
+    public void play() {
+        mController.getTransportControls().play();
+    }
+
+    @Override
+    public void seekTo(int progress) {
+        mController.getTransportControls().seekTo(progress);
     }
 }
