@@ -8,8 +8,8 @@
 
     <ImageButton
         android:id="@+id/button_play"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/ic_play_circle_filled_black_24dp"
         android:tint="@color/colorAccent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,12 +23,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="曖昧エレジー"
         android:textColor="#333"
-        android:textSize="@dimen/text_size_medium"
+        android:textSize="@dimen/text_size_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -50,8 +50,8 @@
 
     <ImageButton
         android:id="@+id/buttonAddPlaylist"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/ic_playlist_add_black_24dp"
         android:tint="@color/colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
