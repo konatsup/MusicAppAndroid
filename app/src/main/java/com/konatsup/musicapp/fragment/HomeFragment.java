@@ -40,6 +40,7 @@ public class HomeFragment extends Fragment {
 
     private List<Tune> tunes;
     private boolean isLoading;
+    private boolean isPlaylistInitialized = false;
 
     public HomeFragment() {
     }
@@ -71,7 +72,10 @@ public class HomeFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                mListener.setCurrentTune(tunes.get(position));
+                mListener.setCurrentTune(tunes.get(position), isPlaylistInitialized);
+                if(!isPlaylistInitialized){
+                    isPlaylistInitialized = true;
+                }
             }
         });
         return view;

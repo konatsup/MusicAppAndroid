@@ -225,9 +225,12 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     @Override
-    public void setCurrentTune(Tune tune) {
+    public void setCurrentTune(Tune tune, boolean isPlaylistInitialized) {
         setupSummaryBar(tune);
         currentTune = tune;
+        if (!isPlaylistInitialized) {
+            mController.getTransportControls().sendCustomAction("RESET_QUEUE_ITEMS", new Bundle());
+        }
     }
 
     @Override

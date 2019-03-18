@@ -293,6 +293,17 @@ public class MusicService extends MediaBrowserServiceCompat {
                 .build());
     }
 
+    public void resetQueueItems() {
+        int i = 0;
+        queueItems.clear();
+        for (MediaBrowserCompat.MediaItem media : MusicLibrary.getMediaItems()) {
+            queueItems.add(new MediaSessionCompat.QueueItem(media.getDescription(), i));
+            Log.d("AAAAAAAAAqueueItems:", queueItems.get(i).toString());
+            i++;
+        }
+        mSession.setQueue(queueItems);
+    }
+
     //通知を作成、サービスをForegroundにする
     private void CreateNotification() {
         MediaControllerCompat controller = mSession.getController();
