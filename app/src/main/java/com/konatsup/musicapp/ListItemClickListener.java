@@ -1,5 +1,8 @@
 package com.konatsup.musicapp;
 
+import java.util.List;
+
 public interface ListItemClickListener {
-    void openPlayer(Tune tune);
+    void setCurrentTune(Tune tune);
+    void updateTuneList(List<Tune> tunes);
 }

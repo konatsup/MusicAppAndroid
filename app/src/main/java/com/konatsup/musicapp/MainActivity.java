@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.media.MediaBrowserCompat;
@@ -15,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,18 +35,21 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     MediaControllerCompat.Callback controllerCallback = new MediaControllerCompat.Callback() {
         //再生中の曲の情報が変更された際に呼び出される
         @Override
-        public void onMetadataChanged(MediaMetadataCompat metadata) { }
+        public void onMetadataChanged(MediaMetadataCompat metadata) {
+
+        }
 
         //プレイヤーの状態が変更された時に呼び出される
         @Override
-        public void onPlaybackStateChanged(PlaybackStateCompat state) { }
+        public void onPlaybackStateChanged(PlaybackStateCompat state) {
+        }
     };
 
     Tune currentTune;
     BottomNavigationView bottomNavigationView;
 
     private ViewPager viewPager;
-    private LinearLayout summaryBar;
+    private ConstraintLayout summaryBar;
     private TextView titleTextView;
     private TextView artistTextView;
 
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         viewPager = (ViewPager) findViewById(R.id.viewpager);
 
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigation);
-        summaryBar = (LinearLayout) findViewById(R.id.summaryBar);
+        summaryBar = (ConstraintLayout) findViewById(R.id.summaryBar);
         titleTextView = (TextView) summaryBar.findViewById(R.id.title);
         artistTextView = (TextView) summaryBar.findViewById(R.id.artist);
 
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         summaryBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openPlayer(currentTune);
+                openPlayer();
             }
         });
 
@@ -190,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         @Override
         public void onChildrenLoaded(@NonNull String parentId, @NonNull List<MediaBrowserCompat.MediaItem> children) {
             //既に再生中でなければ初めの曲を再生をリクエスト
-            if (mController.getPlaybackState() == null)
+            if (mController.getPlaybackState() == null && children.size() != 0)
                 Play(children.get(0).getMediaId());
         }
     };
@@ -210,19 +213,26 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
             stopService(new Intent(this, MusicService.class));
     }
 
-
-    @Override
-    public void openPlayer(Tune tune) {
-        setupSummaryBar(tune);
-        currentTune = tune;
+    private void openPlayer() {
         PlayerFragment fragment = new PlayerFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable("tune", Parcels.wrap(tune));
+        bundle.putParcelable("tune", Parcels.wrap(currentTune));
         fragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.playerContainer, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void setCurrentTune(Tune tune) {
+        setupSummaryBar(tune);
+        currentTune = tune;
+    }
+
+    @Override
+    public void updateTuneList(List<Tune> tunes) {
+        MusicLibrary.setMediaItems(tunes);
     }
 
     @Override

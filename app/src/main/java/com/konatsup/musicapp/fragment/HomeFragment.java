@@ -71,7 +71,7 @@ public class HomeFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                mListener.openPlayer(tunes.get(position));
+                mListener.setCurrentTune(tunes.get(position));
             }
         });
         return view;
@@ -117,6 +117,7 @@ public class HomeFragment extends Fragment {
                 adapter.notifyDataSetChanged();
                 isLoading = false;
                 progressBar.setVisibility(View.GONE);
+                mListener.updateTuneList(tunes);
             }
 
             @Override
