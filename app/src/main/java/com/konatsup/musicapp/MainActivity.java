@@ -7,6 +7,7 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -14,6 +15,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -36,12 +38,43 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
         //再生中の曲の情報が変更された際に呼び出される
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
-
+            currentTuneDuration = (int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION);
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.playerContainer);
+            if (fragment instanceof PlayerFragment) {
+                ((PlayerFragment) fragment).onMetadataChanged(metadata);
+            }
         }
 
         //プレイヤーの状態が変更された時に呼び出される
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
+
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.playerContainer);
+            if (fragment instanceof PlayerFragment) {
+                ((PlayerFragment) fragment).onPlaybackStateChanged(state);
+            }
+            //プレイヤーの状態によってボタンの挙動とアイコンを変更する
+//            if (state.getState() == PlaybackStateCompat.STATE_PLAYING) {
+//                button_play.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        mController.getTransportControls().pause();
+//                    }
+//                });
+//                button_play.setImageResource(R.drawable.exo_controls_pause);
+//            } else {
+//                button_play.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        mController.getTransportControls().play();
+//                    }
+//                });
+//                button_play.setImageResource(R.drawable.exo_controls_play);
+//            }
+//
+//            textView_position.setText(Long2TimeString(state.getPosition()));
+//            seekBar.setProgress((int) state.getPosition());
+
         }
     };
 
@@ -56,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     HomeFragment homeFragment;
     PlaylistFragment playlistFragment;
     MenuItem prevMenuItem;
+    private int currentTuneDuration= 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     private void openPlayer() {
         PlayerFragment fragment = new PlayerFragment();
         Bundle bundle = new Bundle();
+        bundle.putInt("duration", currentTuneDuration);
         bundle.putParcelable("tune", Parcels.wrap(currentTune));
         fragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -225,12 +260,16 @@ public class MainActivity extends AppCompatActivity implements ListItemClickList
     }
 
     @Override
-    public void setCurrentTune(Tune tune, boolean isPlaylistInitialized) {
+    public void setCurrentTune(int positon, Tune tune, boolean isPlaylistInitialized) {
         setupSummaryBar(tune);
         currentTune = tune;
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("index", positon);
         if (!isPlaylistInitialized) {
-            mController.getTransportControls().sendCustomAction("RESET_QUEUE_ITEMS", new Bundle());
+            mController.getTransportControls().sendCustomAction("RESET_QUEUE_ITEMS", bundle);
         }
+        mController.getTransportControls().sendCustomAction("PLAY_FROM_INDEX", bundle);
     }
 
     @Override

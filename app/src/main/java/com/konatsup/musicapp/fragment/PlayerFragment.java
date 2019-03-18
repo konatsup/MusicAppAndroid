@@ -99,26 +99,21 @@ public class PlayerFragment extends Fragment {
         });
 
         Tune tune = Parcels.unwrap(getArguments().getParcelable("tune"));
+        int duration = getArguments().getInt("duration");
         Glide.with(getContext()).load(tune.getImageUrl()).into(jacketImage);
         titleTextView.setText(tune.getTitle());
+        durationTextView.setText(Long2TimeString(duration));
+        seekBar.setMax(getArguments().getInt("duration"));
 
         callback = new MediaControllerCompat.Callback() {
             //再生中の曲の情報が変更された際に呼び出される
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
-                titleTextView.setText(metadata.getDescription().getTitle());
-                jacketImage.setImageBitmap(metadata.getDescription().getIconBitmap());
-                durationTextView.setText(Long2TimeString(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)));
-                seekBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
             }
 
             //プレイヤーの状態が変更された時に呼び出される
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                //プレイヤーの状態によってボタンの挙動とアイコンを変更する
-                isPlaying =  state.getState() == PlaybackStateCompat.STATE_PLAYING;
-                positionTextView.setText(Long2TimeString(state.getPosition()));
-                seekBar.setProgress((int) state.getPosition());
             }
         };
 
@@ -138,6 +133,19 @@ public class PlayerFragment extends Fragment {
         listener.switchBottomNavigationVisibility(true);
         listener = null;
         super.onDetach();
+    }
+
+    public void onMetadataChanged(MediaMetadataCompat metadata) {
+        titleTextView.setText(metadata.getDescription().getTitle());
+        jacketImage.setImageBitmap(metadata.getDescription().getIconBitmap());
+        durationTextView.setText(Long2TimeString(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)));
+        seekBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
+    }
+
+    public void onPlaybackStateChanged(PlaybackStateCompat state) {
+        isPlaying = state.getState() == PlaybackStateCompat.STATE_PLAYING;
+        positionTextView.setText(Long2TimeString(state.getPosition()));
+        seekBar.setProgress((int) state.getPosition());
     }
 
     //Long値をm:ssの形式の文字列にする

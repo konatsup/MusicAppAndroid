@@ -72,7 +72,7 @@ public class HomeFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                mListener.setCurrentTune(tunes.get(position), isPlaylistInitialized);
+                mListener.setCurrentTune(position,tunes.get(position), isPlaylistInitialized);
                 if(!isPlaylistInitialized){
                     isPlaylistInitialized = true;
                 }

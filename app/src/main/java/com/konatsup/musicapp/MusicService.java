@@ -1,7 +1,5 @@
 package com.konatsup.musicapp;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -37,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class MusicService extends MediaBrowserServiceCompat {
     final String TAG = MusicService.class.getSimpleName();//ログ用タグ
     final String ROOT_ID = "root";//クライアントに返すID onGetRoot / onLoadChildrenで使用
@@ -56,19 +53,14 @@ public class MusicService extends MediaBrowserServiceCompat {
     @Override
     public void onCreate() {
         super.onCreate();
-        //AudioManagerを取得
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        //MediaSessionを初期化
         mSession = new MediaSessionCompat(getApplicationContext(), TAG);
-        //このMediaSessionが提供する機能を設定
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | //ヘッドフォン等のボタンを扱う
                 MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS | //キュー系のコマンドの使用をサポート
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS); //再生、停止、スキップ等のコントロールを提供
 
-        //クライアントからの操作に応じるコールバックを設定
         mSession.setCallback(callback);
 
-        //MediaBrowserServiceにSessionTokenを設定
         setSessionToken(mSession.getSessionToken());
 
         //Media Sessionのメタデータや、プレイヤーのステータスが更新されたタイミングで
@@ -76,12 +68,12 @@ public class MusicService extends MediaBrowserServiceCompat {
         mSession.getController().registerCallback(new MediaControllerCompat.Callback() {
             @Override
             public void onPlaybackStateChanged(PlaybackStateCompat state) {
-                CreateNotification();
+//                CreateNotification();
             }
 
             @Override
             public void onMetadataChanged(MediaMetadataCompat metadata) {
-                CreateNotification();
+//                CreateNotification();
             }
         });
 
@@ -95,9 +87,7 @@ public class MusicService extends MediaBrowserServiceCompat {
         mSession.setQueue(queueItems);//WearやAutoにキューが表示される
 
 
-        //exoPlayerの初期化
         exoPlayer = ExoPlayerFactory.newSimpleInstance(getApplicationContext(), new DefaultTrackSelector());
-        //プレイヤーのイベントリスナーを設定
         exoPlayer.addListener(eventListener);
 
         handler = new Handler();
@@ -115,11 +105,6 @@ public class MusicService extends MediaBrowserServiceCompat {
         }, 500);
     }
 
-    //クライアント接続時に呼び出される
-    //パッケージ名などから接続するかどうかを決定する
-    //任意の文字列を返すと接続許可
-    //nullで接続拒否
-    //今回は全ての接続を許可
     @Override
     public BrowserRoot onGetRoot(@NonNull String clientPackageName,
                                  int clientUid,
@@ -137,7 +122,7 @@ public class MusicService extends MediaBrowserServiceCompat {
     public void onLoadChildren(
             @NonNull final String parentMediaId,
             @NonNull final Result<List<MediaBrowserCompat.MediaItem>> result) {
-
+        result.detach();
         if (parentMediaId.equals(ROOT_ID))
             //曲のリストをクライアントに送信
             result.sendResult(MusicLibrary.getMediaItems());
@@ -162,12 +147,9 @@ public class MusicService extends MediaBrowserServiceCompat {
         //WearやAutoのブラウジング画面から曲が選択された場合もここが呼ばれる
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
-            //今回はAssetsフォルダに含まれる音声ファイルを再生
-            //Uriから再生する
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getApplicationContext(), Util.getUserAgent(getApplicationContext(), "AppName"));
-            MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse("file:///android_asset/" + MusicLibrary.getMusicFilename(mediaId)));
+            MediaSource mediaSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(MusicLibrary.getMusicUrl(mediaId)));
 
-            //今回は簡易的にmediaIdからインデックスを割り出す。
             for (MediaSessionCompat.QueueItem item : queueItems)
                 if (item.getDescription().getMediaId().equals(mediaId))
                     index = (int) item.getQueueId();
@@ -182,56 +164,46 @@ public class MusicService extends MediaBrowserServiceCompat {
             mSession.setMetadata(MusicLibrary.getMetadata(getApplicationContext(), mediaId));
         }
 
-        //再生をリクエストされたとき
         @Override
         public void onPlay() {
-            //オーディオフォーカスを要求
             if (am.requestAudioFocus(afChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                //取得できたら再生を始める
                 mSession.setActive(true);
                 exoPlayer.setPlayWhenReady(true);
             }
         }
 
-        //一時停止をリクエストされたとき
         @Override
         public void onPause() {
             exoPlayer.setPlayWhenReady(false);
-            //オーディオフォーカスを開放
             am.abandonAudioFocus(afChangeListener);
         }
 
-        //停止をリクエストされたとき
         @Override
         public void onStop() {
             onPause();
             mSession.setActive(false);
-            //オーディオフォーカスを開放
             am.abandonAudioFocus(afChangeListener);
         }
 
-        //シークをリクエストされたとき
         @Override
         public void onSeekTo(long pos) {
             exoPlayer.seekTo(pos);
         }
 
-        //次の曲をリクエストされたとき
         @Override
         public void onSkipToNext() {
             index++;
-            if (index >= queueItems.size())//ライブラリの最後まで再生したら
-                index = 0;//最初に戻す
+            if (index >= queueItems.size())
+                index = 0;
 
             onPlayFromMediaId(queueItems.get(index).getDescription().getMediaId(), null);
         }
 
-        //前の曲をリクエストされたとき
         @Override
         public void onSkipToPrevious() {
             index--;
-            if (index < 0)//インデックスが0以下になったら
-                index = queueItems.size() - 1;//最後の曲に移動する
+            if (index < 0)
+                index = queueItems.size() - 1;
 
             onPlayFromMediaId(queueItems.get(index).getDescription().getMediaId(), null);
         }
@@ -239,7 +211,7 @@ public class MusicService extends MediaBrowserServiceCompat {
         //WearやAutoでキュー内のアイテムを選択された際にも呼び出される
         @Override
         public void onSkipToQueueItem(long i) {
-            onPlayFromMediaId(queueItems.get((int)i).getDescription().getMediaId(), null);
+            onPlayFromMediaId(queueItems.get((int) i).getDescription().getMediaId(), null);
         }
 
         //Media Button Intentが飛んできた時に呼び出される
@@ -250,6 +222,21 @@ public class MusicService extends MediaBrowserServiceCompat {
             KeyEvent key = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             Log.d(TAG, String.valueOf(key.getKeyCode()));
             return super.onMediaButtonEvent(mediaButtonEvent);
+        }
+
+        @Override
+        public void onCustomAction(String action, Bundle extras) {
+            switch (action) {
+                case "RESET_QUEUE_ITEMS":
+                    resetQueueItems();
+                    break;
+                case "PLAY_FROM_INDEX":
+                    int i = extras.getInt("index");
+                    onPlayFromMediaId(queueItems.get(i).getDescription().getMediaId(), null);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -293,7 +280,7 @@ public class MusicService extends MediaBrowserServiceCompat {
                 .build());
     }
 
-    public void resetQueueItems() {
+    private void resetQueueItems() {
         int i = 0;
         queueItems.clear();
         for (MediaBrowserCompat.MediaItem media : MusicLibrary.getMediaItems()) {
@@ -339,9 +326,9 @@ public class MusicService extends MediaBrowserServiceCompat {
 
                 // Media Styleを利用する
                 .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                .setMediaSession(mSession.getSessionToken())
-                //通知を小さくたたんだ時に表示されるコントロールのインデックスを設定
-                .setShowActionsInCompactView(1));
+                        .setMediaSession(mSession.getSessionToken())
+                        //通知を小さくたたんだ時に表示されるコントロールのインデックスを設定
+                        .setShowActionsInCompactView(1));
 
         // Android4.4以前は通知をスワイプで消せないので
         //キャンセルボタンを表示することで対処

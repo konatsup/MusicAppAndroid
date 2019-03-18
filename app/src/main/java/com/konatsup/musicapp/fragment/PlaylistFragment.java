@@ -72,8 +72,8 @@ public class PlaylistFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                mListener.setCurrentTune(tunes.get(position), isPlaylistInitialized);
-                if(!isPlaylistInitialized){
+                mListener.setCurrentTune(position, tunes.get(position), isPlaylistInitialized);
+                if (!isPlaylistInitialized) {
                     isPlaylistInitialized = true;
                 }
             }
@@ -93,7 +93,7 @@ public class PlaylistFragment extends Fragment {
         super.onDetach();
     }
 
-    private void fetchPosts(){
+    private void fetchPosts() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://music-app-konatsup.herokuapp.com/api/").addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -105,7 +105,7 @@ public class PlaylistFragment extends Fragment {
             public void onResponse(Call<ListPost> call, Response<ListPost> response) {
                 List<Post> listPost = response.body().getListPost();
                 int s = listPost.size();
-                for(int i = 0; i < s; i++){
+                for (int i = 0; i < s; i++) {
                     Tune tune = new Tune();
                     tune.setId(1);
                     tune.setTitle(listPost.get(i).getTitle());
@@ -121,6 +121,7 @@ public class PlaylistFragment extends Fragment {
                 isLoading = false;
                 progressBar.setVisibility(View.GONE);
             }
+
             @Override
             public void onFailure(Call<ListPost> call, Throwable t) {
                 Log.d("debug4", t.getMessage());

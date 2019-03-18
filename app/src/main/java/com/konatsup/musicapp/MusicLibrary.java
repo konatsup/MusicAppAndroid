@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,31 +35,9 @@ public class MusicLibrary {
 
     private static final TreeMap<String, MediaMetadataCompat> music = new TreeMap<>();
     private static final HashMap<String, Integer> albumRes = new HashMap<>();
-    private static final HashMap<String, String> musicFileName = new HashMap<>();
+    private static final HashMap<String, String> musicFileUrl = new HashMap<>();
 
     static {
-        createMediaMetadataCompat(
-                "Jazz_In_Paris",
-                "Jazz in Paris",
-                "Media Right Productions",
-                "Jazz & Blues",
-                "Jazz",
-                103,
-                TimeUnit.SECONDS,
-                "jazz_in_paris.mp3",
-                R.drawable.jacket1,
-                "album_jazz_blues");
-        createMediaMetadataCompat(
-                "The_Coldest_Shoulder",
-                "The Coldest Shoulder",
-                "The 126ers",
-                "Youtube Audio Library Rock 2",
-                "Rock",
-                160,
-                TimeUnit.SECONDS,
-                "the_coldest_shoulder.mp3",
-                R.drawable.jacket1,
-                "album_youtube_audio_library_rock_2");
     }
 
     public static String getRoot() {
@@ -70,8 +49,9 @@ public class MusicLibrary {
                 BuildConfig.APPLICATION_ID + "/drawable/" + albumArtResName;
     }
 
-    public static String getMusicFilename(String mediaId) {
-        return musicFileName.containsKey(mediaId) ? musicFileName.get(mediaId) : null;
+    public static String getMusicUrl(String mediaId) {
+        String s = musicFileUrl.containsKey(mediaId) ? musicFileUrl.get(mediaId) : null;
+        return s;
     }
 
     private static int getAlbumRes(String mediaId) {
@@ -91,6 +71,24 @@ public class MusicLibrary {
                             metadata.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
         }
         return result;
+    }
+
+    public static void setMediaItems(List<Tune> tunes){
+        int i = 0;
+        for (Tune tune : tunes) {
+            createMediaMetadataCompat(
+                    String.valueOf(i),
+                    tune.getTitle(),
+                    tune.getArtist(),
+                    "album",
+                    "genre",
+                    30,
+                    TimeUnit.SECONDS,
+                    tune.getMusicUrl(),
+                    R.drawable.jacket1,
+                    "albumArtResName");
+            i++;
+        }
     }
 
     public static MediaMetadataCompat getMetadata(Context context, String mediaId) {
@@ -125,7 +123,7 @@ public class MusicLibrary {
             String genre,
             long duration,
             TimeUnit durationUnit,
-            String musicFilename,
+            String musicUrl,
             int albumArtResId,
             String albumArtResName) {
         music.put(
@@ -146,6 +144,6 @@ public class MusicLibrary {
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
                         .build());
         albumRes.put(mediaId, albumArtResId);
-        musicFileName.put(mediaId, musicFilename);
+        musicFileUrl.put(mediaId, musicUrl);
     }
 }
