@@ -137,7 +137,7 @@ public class PlayerFragment extends Fragment {
 
     public void onMetadataChanged(MediaMetadataCompat metadata) {
         titleTextView.setText(metadata.getDescription().getTitle());
-        jacketImage.setImageBitmap(metadata.getDescription().getIconBitmap());
+        Glide.with(getContext()).load(metadata.getDescription().getIconBitmap()).into(jacketImage);
         durationTextView.setText(Long2TimeString(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)));
         seekBar.setMax((int) metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION));
     }
